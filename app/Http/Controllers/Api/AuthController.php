@@ -22,7 +22,7 @@ class AuthController extends Controller
         $user = User::create($request->safe()->only(['name', 'email', 'password']));
 
         return ApiResponse::success(
-            $this->tokenPayload($user->refresh(), $request->validated('device_name')),
+            $this->tokenPayload($user->refresh()),
             'Registration successful.',
             Response::HTTP_CREATED,
         );
@@ -44,7 +44,7 @@ class AuthController extends Controller
         }
 
         return ApiResponse::success(
-            $this->tokenPayload($user, $request->validated('device_name')),
+            $this->tokenPayload($user),
             'Login successful.',
         );
     }
@@ -73,11 +73,11 @@ class AuthController extends Controller
     /**
      * @return array{user: User, token: string, token_type: string}
      */
-    private function tokenPayload(User $user, ?string $deviceName): array
+    private function tokenPayload(User $user): array
     {
         return [
             'user' => $user,
-            'token' => $user->createToken($deviceName ?: 'api')->plainTextToken,
+            'token' => $user->createToken('api')->plainTextToken,
             'token_type' => 'Bearer',
         ];
     }
