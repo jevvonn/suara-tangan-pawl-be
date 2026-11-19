@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [ForceJsonResponse::class]);
+
+        $middleware->alias([
+            'admin' => EnsureUserIsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $isApi = fn (Request $request): bool => $request->is('api/*') || $request->expectsJson();
@@ -42,6 +48,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // 404 (incl. ModelNotFound), 403 (incl. AuthorizationException), 405, 429, abort(), ...
             if ($e instanceof HttpExceptionInterface) {
+                // Route model binding miss: don't leak the model class name ("No query results for model [App\Models\...]").
+                if ($e->getPrevious() instanceof ModelNotFoundException) {
+                    return ApiResponse::error('Data not found.', null, Response::HTTP_NOT_FOUND);
+                }
+
                 $status = $e->getStatusCode();
                 $message = $e->getMessage() ?: (Response::$statusTexts[$status] ?? 'Error.');
 
