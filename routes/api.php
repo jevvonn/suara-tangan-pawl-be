@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\EducationNewsController;
 use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\UserController;
@@ -29,6 +30,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('education-news', EducationNewsController::class)
         ->only(['store', 'update', 'destroy'])
         ->parameters(['education-news' => 'news']);
+
+    Route::get('dashboard/stats', [DashboardController::class, 'stats']);
 
     // Users: admins can view, change the role, and delete. Creating happens via /auth/register.
     Route::apiResource('users', UserController::class)->except(['store']);

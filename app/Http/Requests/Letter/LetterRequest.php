@@ -34,7 +34,7 @@ class LetterRequest extends FormRequest
                 $letter ? 'nullable' : 'required',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048', // KB, same 2 MB limit as the dashboard's image picker
+                'max:10240', // max 10mb
             ],
         ];
     }
