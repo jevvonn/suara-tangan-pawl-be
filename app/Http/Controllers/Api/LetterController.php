@@ -7,7 +7,9 @@ use App\Http\Requests\Letter\LetterRequest;
 use App\Http\Resources\LetterResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\Letter;
+use App\Support\SignTranslator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -32,6 +34,23 @@ class LetterController extends Controller
             LetterResource::collection($letters),
             'Letters retrieved successfully.',
         );
+    }
+
+    /**
+     * GET /api/letters/translate?sentence=Halo apa kabar
+     *
+     * Returns only the letters found for the sentence's symbols (one `IN` query).
+     * The frontend builds the cards and shows an empty card for anything missing.
+     */
+    public function translate(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'sentence' => ['required', 'string', 'max:255'],
+        ]);
+
+        $letters = SignTranslator::lettersFor(SignTranslator::symbolsIn($validated['sentence']));
+
+        return ApiResponse::success(LetterResource::collection($letters), 'Sentence translated successfully.');
     }
 
     /**
