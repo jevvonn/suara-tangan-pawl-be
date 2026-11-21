@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LetterController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
@@ -21,4 +22,7 @@ Route::apiResource('letters', LetterController::class)->only(['index', 'show']);
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('letters', LetterController::class)->only(['store', 'update', 'destroy']);
+
+    // Users: admins can view, change the role, and delete. Creating happens via /auth/register.
+    Route::apiResource('users', UserController::class)->except(['store']);
 });
