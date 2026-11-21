@@ -12,6 +12,8 @@ RUN install-php-extensions \
     zip \
     opcache
 
+RUN printf "upload_max_filesize = 12M\npost_max_size = 16M\n" > "$PHP_INI_DIR/conf.d/uploads.ini"
+
 # Copy Composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
