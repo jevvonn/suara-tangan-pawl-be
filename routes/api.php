@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EducationNewsController;
 use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -17,11 +18,17 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     });
 });
 
-// Letters: anyone can read (the landing page translator needs them), only admins can change.
+// Letters and education news: anyone can read (public pages need them), only admins can change.
 Route::apiResource('letters', LetterController::class)->only(['index', 'show']);
+Route::apiResource('education-news', EducationNewsController::class)
+    ->only(['index', 'show'])
+    ->parameters(['education-news' => 'news']);
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::apiResource('letters', LetterController::class)->only(['store', 'update', 'destroy']);
+    Route::apiResource('education-news', EducationNewsController::class)
+        ->only(['store', 'update', 'destroy'])
+        ->parameters(['education-news' => 'news']);
 
     // Users: admins can view, change the role, and delete. Creating happens via /auth/register.
     Route::apiResource('users', UserController::class)->except(['store']);
