@@ -1,0 +1,21 @@
+# Keep the image clean: these are rebuilt inside the container or come from env_file.
+.git
+.env
+.env.*
+!.env.example
+vendor
+node_modules
+.phpunit.result.cache
+.playwright-mcp
+
+# The host's public/storage link points to a Windows path; the Dockerfile recreates it.
+public/storage
+
+# Local uploads and runtime files stay out of the image (uploads live in the app-storage volume).
+storage/app/public/*
+!storage/app/public/.gitignore
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+database/database.sqlite
